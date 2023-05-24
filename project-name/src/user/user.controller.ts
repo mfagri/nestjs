@@ -5,7 +5,13 @@ import { UserService } from "./user.service";
 export class UserController {
     constructor(private readonly userService: UserService){}
 
+    // @Post()
     @Post()
+    // async addUser(@Body() user: User): Promise<{ userid: number }> {
+    //   const { name, password } = user;
+    //   const id = await this.userService.insertUser(name, password);
+    //   return { userid: id };
+    // }
     addUser(
         @Body('uname') name: string,
         // @Body('lastname') lastname: string,
@@ -27,6 +33,12 @@ export class UserController {
         console.log(name);
         return this.userService.getSingleUser(name);
     }
+    // @Post()
+    // getUserlog(@Param('uname') name: string)
+    // {
+    //     console.log(name);
+    //     return this.userService.getSingleUser(name);
+    // }
     @Patch(':uname')
     updateUser(
         @Param('uname') name: string,
