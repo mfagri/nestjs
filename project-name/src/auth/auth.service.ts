@@ -1,9 +1,10 @@
 import { ForbiddenException, Injectable } from "@nestjs/common";
-import { User, Bookmark } from "@prisma/client";
+// import { User, Bookmark } from "@prisma/client";
 import { PrismaService } from "src/prisma/prisma.service";
 import * as argon from "argon2";
 import { AuthDto } from "./dto";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
+import { User } from "src/user/user.model";
 
 @Injectable()
 export class AuthService {
@@ -38,7 +39,31 @@ export class AuthService {
     }
   }
 
-  login() {
-    return "hello";
+  async login(dto:AuthDto) {
+    //find the user by email
+    const user = await this.prisma.user.findUnique({
+      where:{
+        email: dto.email
+      }
+    })
+    //if user does not exist hrow exception
+    if(!user)
+    {
+      throw new ForbiddenException(
+        'Credentials incorrect',
+      );
+    }
+    // compare password
+    const pswdv = await argon.verify(user.hash,dto.password);
+    //if password incorrect throw exeption
+    if(!pswdv)
+    {
+      throw new ForbiddenException(
+        'Credentials incorrect',
+      );
+    }
+    //send back the user
+    delete user.hash;
+    return user;
   }
 }
